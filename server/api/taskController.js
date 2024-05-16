@@ -11,33 +11,38 @@ exports.getTasks = async (req, res) => {
 };
 
 // Add a new task
-// POST a new task
 exports.addTask = async (req, res) => {
-  console.log("Attempting to add task:", req.body);  // Log the incoming request body
   try {
-    const { title, description, status } = req.body;
+    const { title, description, date, status } = req.body;  // Include date in the request body
     const task = new Task({
       title,
       description,
+      date: new Date(date),  // Convert to Date object
       status
     });
 
     const savedTask = await task.save();
-    console.log("Task added:", savedTask);  // Log the saved task
     res.status(201).json(savedTask);
   } catch (error) {
-    console.error("Error adding task:", error);  // Log any errors
     res.status(400).json({ message: error.message });
   }
 };
 
 
 
+
 // Update an existing task
 exports.updateTask = async (req, res) => {
   try {
-    const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(task);
+    const { title, description, date, status } = req.body;  // Include date in the request body
+    const updatedTask = await Task.findByIdAndUpdate(
+      req.params.id,
+      { title, description, date: new Date(date), status },
+      { new: true }
+    );
+
+    if (!updatedTask) return res.status(404).json({ message: 'Task not found' });
+    res.json(updatedTask);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

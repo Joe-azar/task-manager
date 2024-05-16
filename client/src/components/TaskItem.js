@@ -1,11 +1,14 @@
 import React from 'react';
 
 function TaskItem({ task, deleteTask, editTask }) {
+  const formattedDate = new Date(task.date).toLocaleString(); // Format the date
+
   return (
     <li className="task-item">
       <div className="task-content">
         <h4>{task.title}</h4>
         <p>{task.description}</p>
+        <p>{formattedDate}</p>  {/* Display the formatted date */}
       </div>
       <div className="task-actions">
         <button onClick={() => editTask(task._id)} className="button button-small button-edit">Edit</button>
