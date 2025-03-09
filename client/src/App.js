@@ -38,21 +38,28 @@ function App() {
   };
 
   const updateTask = async (id, updatedTask) => {
-    const response = await fetch(`http://localhost:5000/tasks/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updatedTask)
-    });
-    if (response.ok) {
+    try {
+      console.log("Updating Task:", id, updatedTask);  // Debugging Log
+  
+      const response = await fetch(`http://localhost:5000/tasks/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedTask)
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to update task: ${response.statusText}`);
+      }
+  
       const updatedItem = await response.json();
-      setTasks(tasks.map(task => (task._id === id ? { ...task, ...updatedItem } : task)).sort((a, b) => new Date(a.date) - new Date(b.date)));
+      setTasks(tasks.map(task => (task._id === id ? { ...task, ...updatedItem } : task)));
       setEditing(false);
-    } else {
-      console.error('Failed to update task');
+    } catch (error) {
+      console.error('Failed to update task:', error);
     }
-  };
+  };  
 
   const deleteTask = async (id) => {
     await fetch(`http://localhost:5000/tasks/${id}`, {
@@ -70,7 +77,7 @@ function App() {
     <div className="app-container">
       <Navbar />
       <header className="app-header">
-        <h1>Welcome To Our App</h1>
+        <h1>Task Manager</h1>
       </header>
       <div className="tasks-section">
         {editing ? (

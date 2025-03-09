@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import '../App.css';  // Ensure this is imported if not already
+import '../App.css';
 
 function EditTaskForm({ taskId, updateTask, setEditing }) {
-  const [task, setTask] = useState({ title: '', description: '' });
+  const [task, setTask] = useState({ title: '', description: '', date: '' });
 
   useEffect(() => {
     const fetchTask = async () => {
-      const res = await fetch(`http://localhost:5000/tasks/${taskId}`);
-      const data = await res.json();
-      setTask({ title: data.title, description: data.description });
+      try {
+        const res = await fetch(`http://localhost:5000/tasks/${taskId}`);
+        if (!res.ok) {
+          throw new Error("Task not found");
+        }
+        const data = await res.json();
+        setTask({ title: data.title, description: data.description, date: data.date });
+      } catch (error) {
+        console.error("Error fetching task:", error);
+      }
     };
     fetchTask();
   }, [taskId]);
@@ -20,6 +27,7 @@ function EditTaskForm({ taskId, updateTask, setEditing }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("Update Task Submitted: ", task);
     updateTask(taskId, task);
   };
 
@@ -28,7 +36,7 @@ function EditTaskForm({ taskId, updateTask, setEditing }) {
       <h2 className="edit-form-title">Edit Task</h2>
       <form onSubmit={handleSubmit}>
         <div className="edit-form-group">
-          <label className="edit-form-label" htmlFor="title">Title:</label>
+          <label className="edit-form-label">Title:</label>
           <input
             className="edit-form-input"
             type="text"
@@ -39,7 +47,7 @@ function EditTaskForm({ taskId, updateTask, setEditing }) {
           />
         </div>
         <div className="edit-form-group">
-          <label className="edit-form-label" htmlFor="description">Description:</label>
+          <label className="edit-form-label">Description:</label>
           <input
             className="edit-form-input"
             type="text"
@@ -49,8 +57,19 @@ function EditTaskForm({ taskId, updateTask, setEditing }) {
             required
           />
         </div>
+        <div className="edit-form-group">
+          <label className="edit-form-label">Date:</label>
+          <input
+            className="edit-form-input"
+            type="datetime-local"
+            name="date"
+            value={task.date}
+            onChange={handleChange}
+            required
+          />
+        </div>
         <button className="edit-form-button" type="submit">Update Task</button>
-        <button className="edit-form-button cancel" onClick={() => setEditing(false)}>Cancel</button>
+        <button type="button" className="edit-form-button cancel" onClick={() => setEditing(false)}>Cancel</button>
       </form>
     </div>
   );
