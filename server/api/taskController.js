@@ -1,6 +1,26 @@
 const Task = require('../models/taskModel');
 const mongoose = require('mongoose');
 
+// ✅ Toggle Task Completion
+exports.toggleTaskCompletion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const task = await Task.findById(id);
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    task.completed = !task.completed;
+    await task.save();
+
+    res.json(task);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating task completion" });
+  }
+};
+
+
 // ✅ Get a single task by ID (only if it belongs to the user)
 exports.getTaskById = async (req, res) => {
   try {

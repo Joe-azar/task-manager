@@ -1,10 +1,11 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const taskSchema = new mongoose.Schema({
+const TaskSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  description: { type: String, required: true },
+  description: { type: String },
   date: { type: Date, required: true },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }  // ✅ Link task to user
+  completed: { type: Boolean, default: false },  // ✅ Track task status
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 
-module.exports = mongoose.model('Task', taskSchema);
+module.exports = mongoose.model("Task", TaskSchema);

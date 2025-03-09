@@ -25,8 +25,8 @@
 
 .logout-btn {
   padding: 8px 15px;
-  background-color: white;
-  color: #007bff;
+  background-color: #dc3545;
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -35,6 +35,22 @@
 }
 
 .logout-btn:hover {
-  background-color: #0056b3;
+  background-color: #b52a37;
   color: white;
+}
+.analytics-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.analytics-btn:hover {
+  background-color: #0056b3;
+}
+.analytics-btn, .logout-btn {
+  margin-left: 10px;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px;
 }

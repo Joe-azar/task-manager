@@ -17,6 +17,7 @@ function Navbar() {
       <h2>Task Manager</h2>
       <div className="navbar-right">
         {user && <span className="user-name">👤 {user.name}</span>} {/* ✅ Show User Name */}
+        <button onClick={() => navigate("/analytics")} className="analytics-btn">📊 Analytics</button>  {/* ✅ New Button */}
         <button onClick={handleLogout} className="logout-btn">Logout</button>
       </div>
     </nav>
