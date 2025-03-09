@@ -1,66 +1,91 @@
-const User = require('../models/userModel');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const sendVerificationEmail = require("../utils/emailService");
+require("dotenv").config();
 
-
-// Register User (Signup)
-exports.registerUser = async (req, res) => {
+// ✅ User Signup & Send Verification Email
+exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if user already exists
-    let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: "User already exists" });
+    // ✅ Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
-    // Hash password before saving to DB
+    // ✅ Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ name, email, password: hashedPassword, isVerified: false });
 
-    // Create new user
-    user = new User({ name, email, password: hashedPassword });
+    // ✅ Save user
     await user.save();
 
-    res.status(201).json({ message: "User registered successfully" });
+    // ✅ Generate Verification Token
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+    // ✅ Send Verification Email
+    await sendVerificationEmail(email, token);
+
+    res.status(201).json({ message: "Signup successful! Check your email to verify your account." });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// ✅ Verify User Email
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    // ✅ Decode the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findOne({ email: decoded.email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ✅ Mark user as verified
+    user.isVerified = true;
+    await user.save();
+
+    res.json({ message: "Email verified successfully! You can now log in." });
+  } catch (error) {
+    res.status(400).json({ message: "Invalid or expired token" });
   }
 };
 
 
 
 // Login User
-exports.loginUser = async (req, res) => {
+exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log("🟡 Login attempt for:", email); // Debugging Log
-
-    if (!email || !password) {
-      console.log("❌ Missing email or password");
-      return res.status(400).json({ message: "Please provide email and password" });
-    }
-
-    // Check if user exists
+    // ✅ Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      console.log("❌ User not found in database");
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Compare passwords
+    // ✅ Check if user is verified
+    if (!user.isVerified) {
+      return res.status(403).json({ message: "Please verify your email before logging in." });
+    }
+
+    // ✅ Validate password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log("❌ Incorrect password");
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    // ✅ Generate Token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-    console.log("✅ Login successful");
     res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
   } catch (error) {
-    console.error("🚨 Server error on login:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

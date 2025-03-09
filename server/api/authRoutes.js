@@ -1,10 +1,9 @@
-const express = require('express');
-const { registerUser, loginUser } = require('./authController'); // ✅ Ensure this is correct
+const express = require("express");
+const { register, verifyEmail } = require("./authController");
 
 const router = express.Router();
 
-// Define authentication routes
-router.post('/register', registerUser);
-router.post('/login', loginUser);
+router.post("/register", register);
+router.get("/verify/:token", verifyEmail);  // ✅ Verification Route
 
 module.exports = router;

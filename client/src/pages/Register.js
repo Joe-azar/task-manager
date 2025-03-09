@@ -3,59 +3,36 @@ import { useNavigate, Link } from "react-router-dom";
 import "../styles/Auth.css";  // Import CSS file for styling
 
 function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [message, setMessage] = useState("");  // ✅ Show verification message
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const response = await fetch("http://localhost:5000/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify(formData),
     });
 
     const data = await response.json();
-    if (response.ok) {
-      alert("User registered successfully! Please login.");
-      navigate("/login");
-    } else {
-      alert(data.message);
-    }
+    setMessage(data.message);
   };
 
   return (
-    <div className="auth-container">
-      <h2>Create an Account</h2>
+    <div>
+      <h2>Register</h2>
+      {message && <p>{message}</p>}  {/* ✅ Show success message */}
       <form onSubmit={handleSubmit}>
-        <input 
-          type="text" 
-          placeholder="Full Name" 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
-          required 
-        />
-        <input 
-          type="email" 
-          placeholder="Email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          required 
-        />
-        <input 
-          type="password" 
-          placeholder="Password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          required 
-        />
+        <input type="text" name="name" placeholder="Name" onChange={handleChange} required />
+        <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
+        <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
         <button type="submit">Sign Up</button>
       </form>
-
-      <p>
-        Already have an account? <Link to="/login">Login</Link>
-      </p>
     </div>
   );
 }
