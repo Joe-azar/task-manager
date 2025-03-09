@@ -8,11 +8,8 @@ function EditTaskForm({ taskId, updateTask, setEditing }) {
     const fetchTask = async () => {
       try {
         const token = localStorage.getItem("token"); // ✅ Get token
-
         const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
-          headers: {
-            'Authorization': token // ✅ Send token
-          }
+          headers: { 'Authorization': token }
         });
 
         if (!response.ok) {
@@ -20,15 +17,17 @@ function EditTaskForm({ taskId, updateTask, setEditing }) {
         }
 
         const data = await response.json();
-        setTask({ title: data.title, description: data.description, date: data.date });
+
+        // ✅ Convert UTC date to "YYYY-MM-DDTHH:MM" format
+        const formattedDate = data.date ? new Date(data.date).toISOString().slice(0, 16) : '';
+
+        setTask({ title: data.title, description: data.description, date: formattedDate });
       } catch (error) {
         console.error("Error fetching task:", error);
       }
     };
 
-    if (taskId) {
-      fetchTask();
-    }
+    if (taskId) fetchTask();
   }, [taskId]);
 
   const handleChange = (e) => {
