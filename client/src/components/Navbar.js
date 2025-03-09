@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import './Navbar.css';
+import "../styles/Navbar.css";  // ✅ Updated CSS path
 
 function Navbar() {
-  const { logout } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -15,7 +15,10 @@ function Navbar() {
   return (
     <nav className="navbar">
       <h2>Task Manager</h2>
-      <button onClick={handleLogout}>Logout</button>
+      <div className="navbar-right">
+        {user && <span className="user-name">👤 {user.name}</span>} {/* ✅ Show User Name */}
+        <button onClick={handleLogout} className="logout-btn">Logout</button>
+      </div>
     </nav>
   );
 }

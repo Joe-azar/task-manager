@@ -17,13 +17,7 @@ body {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-/* Header within the app */
-.app-header {
-  background-color: #282c34;
-  padding: 20px;
-  color: white;
-  text-align: center;
-}
+
 /* Task list styles */
 .task-list {
   padding: 0;

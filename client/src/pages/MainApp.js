@@ -84,9 +84,6 @@ function MainApp() {
   return (
     <div className="app-container">
       <Navbar />
-      <header className="app-header">
-        <h1>Task Manager</h1>
-      </header>
       <div className="tasks-section">
         {editing ? (
           <EditTaskForm taskId={currentTaskId} updateTask={updateTask} setEditing={setEditing} />
