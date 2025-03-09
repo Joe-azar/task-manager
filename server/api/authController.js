@@ -44,20 +44,21 @@ exports.verifyEmail = async (req, res) => {
     const user = await User.findOne({ email: decoded.email });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).send("<h2>User not found</h2>");
     }
 
     // ✅ Check if already verified
     if (user.isVerified) {
-      return res.json({ message: "Email is already verified. You can log in." });
+      return res.redirect(`${process.env.FRONTEND_URL}/login?verified=already`);
     }
 
     // ✅ Mark user as verified & save to database
     await User.updateOne({ email: decoded.email }, { $set: { isVerified: true } });
 
-    res.json({ message: "Email verified successfully! You can now log in." });
+    // ✅ Redirect to Login Page After Successful Verification
+    return res.redirect(`${process.env.FRONTEND_URL}/login?verified=success`);
   } catch (error) {
-    res.status(400).json({ message: "Invalid or expired token" });
+    return res.redirect(`${process.env.FRONTEND_URL}/login?verified=failed`);
   }
 };
 
