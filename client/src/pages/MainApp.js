@@ -59,42 +59,57 @@ function MainApp() {
 
   const updateTask = async (id, updatedTask) => {
     try {
-      console.log("Updating Task:", id, updatedTask);
-
+      const token = localStorage.getItem("token");  // ✅ Get token
+  
       const response = await fetch(`http://localhost:5000/tasks/${id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': token  // ✅ Send token
         },
         body: JSON.stringify(updatedTask)
       });
-
+  
       if (!response.ok) {
         throw new Error(`Failed to update task: ${response.statusText}`);
       }
-
+  
       const updatedItem = await response.json();
-
+  
       setTasks(prevTasks => {
         const updatedTasks = prevTasks.map(task => 
           task._id === id ? { ...task, ...updatedItem } : task
         );
-
+  
         return updatedTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
       });
-
+  
       setEditing(false);
     } catch (error) {
       console.error('Failed to update task:', error);
     }
-  };
+  };  
 
   const deleteTask = async (id) => {
-    await fetch(`http://localhost:5000/tasks/${id}`, {
-      method: 'DELETE'
-    });
-    setTasks(tasks.filter(task => task._id !== id).sort((a, b) => new Date(a.date) - new Date(b.date)));
-  };
+    try {
+      const token = localStorage.getItem("token");  // ✅ Get token
+  
+      const response = await fetch(`http://localhost:5000/tasks/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': token  // ✅ Send token
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error("Unauthorized: Token missing or invalid");
+      }
+  
+      setTasks(prevTasks => prevTasks.filter(task => task._id !== id));
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
+  };  
 
   const editTask = (id) => {
     setCurrentTaskId(id);
