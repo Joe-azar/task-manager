@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const authMiddleware = (req, res, next) => {
   try {
@@ -8,7 +8,8 @@ const authMiddleware = (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized: No token provided" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // ✅ Ensure "Bearer " is removed before verifying the token
+    const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
     req.user = decoded;
 
     next();

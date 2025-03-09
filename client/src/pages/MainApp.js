@@ -16,22 +16,22 @@ function MainApp() {
 
   const fetchTasks = async () => {
     try {
-      const token = localStorage.getItem("token");  // ✅ Get token from localStorage
-      const response = await fetch('http://localhost:5000/tasks', {
-        headers: {
-          "Authorization": token  // ✅ Send token in headers
-        }
+      const token = localStorage.getItem("token");
+  
+      if (!token) throw new Error("No token found");
+  
+      const response = await fetch("http://localhost:5000/tasks", {
+        headers: { Authorization: `Bearer ${token}` }, // ✅ Ensure token is prefixed with "Bearer "
       });
   
-      const data = await response.json();
-      if (!Array.isArray(data)) throw new Error("Invalid response format");
+      if (!response.ok) throw new Error("Failed to fetch tasks");
   
-      const sortedTasks = data.sort((a, b) => new Date(a.date) - new Date(b.date));
-      setTasks(sortedTasks);
+      const data = await response.json();
+      setTasks(data);
     } catch (error) {
-      console.error("Failed to fetch tasks:", error);
+      console.error("Error fetching tasks:", error);
     }
-  };  
+  };
 
   const addTask = async (task) => {
     try {
