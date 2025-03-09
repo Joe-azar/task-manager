@@ -3,7 +3,7 @@ import TaskList from '../components/TaskList';
 import AddTaskForm from '../components/AddTaskForm';
 import EditTaskForm from '../components/EditTaskForm';
 import Navbar from '../components/Navbar';
-import '../App.css';
+import '../styles/App.css';
 
 function MainApp() {
   const [editing, setEditing] = useState(false);
