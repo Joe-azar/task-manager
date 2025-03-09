@@ -16,26 +16,46 @@ function MainApp() {
 
   const fetchTasks = async () => {
     try {
-      const response = await fetch('http://localhost:5000/tasks');
+      const token = localStorage.getItem("token");  // ✅ Get token from localStorage
+      const response = await fetch('http://localhost:5000/tasks', {
+        headers: {
+          "Authorization": token  // ✅ Send token in headers
+        }
+      });
+  
       const data = await response.json();
+      if (!Array.isArray(data)) throw new Error("Invalid response format");
+  
       const sortedTasks = data.sort((a, b) => new Date(a.date) - new Date(b.date));
       setTasks(sortedTasks);
     } catch (error) {
-      console.error('Failed to fetch tasks:', error);
+      console.error("Failed to fetch tasks:", error);
     }
-  };
+  };  
 
   const addTask = async (task) => {
-    const response = await fetch('http://localhost:5000/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(task)
-    });
-    const newTask = await response.json();
-    setTasks([...tasks, newTask].sort((a, b) => new Date(a.date) - new Date(b.date)));
-  };
+    try {
+      const token = localStorage.getItem("token");  // ✅ Get JWT token from localStorage
+  
+      const response = await fetch('http://localhost:5000/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token  // ✅ Send token in headers
+        },
+        body: JSON.stringify(task)
+      });
+  
+      if (!response.ok) {
+        throw new Error("Unauthorized: Token missing or invalid");
+      }
+  
+      const newTask = await response.json();
+      setTasks([...tasks, newTask].sort((a, b) => new Date(a.date) - new Date(b.date)));
+    } catch (error) {
+      console.error("Failed to add task:", error);
+    }
+  };  
 
   const updateTask = async (id, updatedTask) => {
     try {

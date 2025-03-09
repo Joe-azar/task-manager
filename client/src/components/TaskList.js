@@ -1,13 +1,18 @@
-import React from 'react';
-import TaskItem from './TaskItem';
+import React from "react";
+import TaskItem from "./TaskItem";
 
-function TaskList({ tasks, deleteTask, editTask  }) {
+function TaskList({ tasks, deleteTask, editTask }) {
   return (
-    <ul className="task-list">
-      {tasks.map(task => (
-        <TaskItem key={task._id} task={task} deleteTask={deleteTask} editTask={editTask} />
+    <div>
+      {tasks.map((task) => (
+        <TaskItem
+          key={task._id}  // ✅ Ensure each task has a unique key
+          task={task}
+          deleteTask={deleteTask}
+          editTask={editTask}
+        />
       ))}
-    </ul>
+    </div>
   );
 }
 

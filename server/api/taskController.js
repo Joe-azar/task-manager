@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
 const Task = require('../models/taskModel');
+const mongoose = require('mongoose');
 
-// GET all tasks
+// ✅ Fetch only the tasks of the logged-in user
 exports.getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find();
+    const tasks = await Task.find({ user: req.user.id });
     res.json(tasks);
   } catch (error) {
     console.error("Error fetching tasks:", error);
@@ -12,32 +12,11 @@ exports.getTasks = async (req, res) => {
   }
 };
 
-// GET a single task by ID
-exports.getTaskById = async (req, res) => {
-  try {
-    const taskId = req.params.id;
-
-    if (!mongoose.Types.ObjectId.isValid(taskId)) {
-      return res.status(400).json({ message: "Invalid Task ID format" });
-    }
-
-    const task = await Task.findById(taskId);
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
-    }
-
-    res.json(task);
-  } catch (error) {
-    console.error("Error retrieving task:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-// POST a new task
+// ✅ Create a task and link it to the user
 exports.addTask = async (req, res) => {
   try {
     const { title, description, date } = req.body;
-    const task = new Task({ title, description, date: new Date(date) });
+    const task = new Task({ title, description, date, user: req.user.id });
 
     const savedTask = await task.save();
     res.status(201).json(savedTask);
@@ -46,26 +25,21 @@ exports.addTask = async (req, res) => {
   }
 };
 
-// PUT - Update a task
+// ✅ Update a task - Only if the user owns it
 exports.updateTask = async (req, res) => {
   try {
-    const { title, description, date } = req.body;
     const taskId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(taskId)) {
       return res.status(400).json({ message: "Invalid Task ID format" });
     }
 
-    const updatedTask = await Task.findByIdAndUpdate(
-      taskId,
-      { title, description, date: new Date(date) },
-      { new: true }
-    );
-
-    if (!updatedTask) {
-      return res.status(404).json({ message: "Task not found" });
+    const task = await Task.findOne({ _id: taskId, user: req.user.id });
+    if (!task) {
+      return res.status(403).json({ message: "Unauthorized: You can only update your own tasks" });
     }
 
+    const updatedTask = await Task.findByIdAndUpdate(taskId, req.body, { new: true });
     res.json(updatedTask);
   } catch (error) {
     console.error("Error updating task:", error);
@@ -73,7 +47,7 @@ exports.updateTask = async (req, res) => {
   }
 };
 
-// DELETE a task
+// ✅ Delete a task - Only if the user owns it
 exports.deleteTask = async (req, res) => {
   try {
     const taskId = req.params.id;
@@ -82,11 +56,12 @@ exports.deleteTask = async (req, res) => {
       return res.status(400).json({ message: "Invalid Task ID format" });
     }
 
-    const deletedTask = await Task.findByIdAndDelete(taskId);
-    if (!deletedTask) {
-      return res.status(404).json({ message: "Task not found" });
+    const task = await Task.findOne({ _id: taskId, user: req.user.id });
+    if (!task) {
+      return res.status(403).json({ message: "Unauthorized: You can only delete your own tasks" });
     }
 
+    await Task.findByIdAndDelete(taskId);
     res.json({ message: "Task deleted successfully" });
   } catch (error) {
     console.error("Error deleting task:", error);
