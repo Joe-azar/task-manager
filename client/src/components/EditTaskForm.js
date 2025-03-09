@@ -7,17 +7,28 @@ function EditTaskForm({ taskId, updateTask, setEditing }) {
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/tasks/${taskId}`);
-        if (!res.ok) {
-          throw new Error("Task not found");
+        const token = localStorage.getItem("token"); // ✅ Get token
+
+        const response = await fetch(`http://localhost:5000/tasks/${taskId}`, {
+          headers: {
+            'Authorization': token // ✅ Send token
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Task not found or unauthorized access");
         }
-        const data = await res.json();
+
+        const data = await response.json();
         setTask({ title: data.title, description: data.description, date: data.date });
       } catch (error) {
         console.error("Error fetching task:", error);
       }
     };
-    fetchTask();
+
+    if (taskId) {
+      fetchTask();
+    }
   }, [taskId]);
 
   const handleChange = (e) => {

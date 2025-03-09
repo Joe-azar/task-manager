@@ -1,6 +1,23 @@
 const Task = require('../models/taskModel');
 const mongoose = require('mongoose');
 
+// ✅ Get a single task by ID (only if it belongs to the user)
+exports.getTaskById = async (req, res) => {
+  try {
+    const task = await Task.findOne({ _id: req.params.id, user: req.user.id }); // ✅ Only fetch user's task
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.json(task);
+  } catch (error) {
+    console.error("Error fetching task:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 // ✅ Fetch only the tasks of the logged-in user
 exports.getTasks = async (req, res) => {
   try {
