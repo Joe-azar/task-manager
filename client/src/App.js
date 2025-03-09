@@ -54,7 +54,17 @@ function App() {
       }
   
       const updatedItem = await response.json();
-      setTasks(tasks.map(task => (task._id === id ? { ...task, ...updatedItem } : task)));
+  
+      // Update the task list and re-sort by date
+      setTasks(prevTasks => {
+        const updatedTasks = prevTasks.map(task => 
+          task._id === id ? { ...task, ...updatedItem } : task
+        );
+  
+        // 🔥 Sort tasks by date after update
+        return updatedTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+      });
+  
       setEditing(false);
     } catch (error) {
       console.error('Failed to update task:', error);
