@@ -198,6 +198,21 @@ body {
 .edit-form-button.cancel:hover {
   background-color: #5a6268;
 }
+.button-complete {
+  background-color: #28a745;
+  color: white;
+  margin-right: 10px;
+}
+
+.button-complete:hover {
+  background-color: #218838;
+}
+
+.completed {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
 
 
 

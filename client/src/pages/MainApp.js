@@ -116,6 +116,33 @@ function MainApp() {
     setEditing(true);
   };
 
+  const toggleCompletion = async (id) => {
+    try {
+      const token = localStorage.getItem("token"); // ✅ Get token
+  
+      const response = await fetch(`http://localhost:5000/tasks/toggle/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // ✅ Send token
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to toggle task completion: ${response.statusText}`);
+      }
+  
+      const updatedTask = await response.json();
+  
+      // ✅ Update the task list
+      setTasks(prevTasks =>
+        prevTasks.map(task => (task._id === id ? updatedTask : task))
+      );
+    } catch (error) {
+      console.error("Failed to toggle task completion:", error);
+    }
+  };
+  
   return (
     <div className="app-container">
       <Navbar />
@@ -125,12 +152,18 @@ function MainApp() {
         ) : (
           <div>
             <AddTaskForm addTask={addTask} />
-            <TaskList tasks={tasks} deleteTask={deleteTask} editTask={editTask} />
+            {/* ✅ Updated TaskList with toggleCompletion */}
+            <TaskList 
+              tasks={tasks} 
+              deleteTask={deleteTask} 
+              editTask={editTask} 
+              toggleCompletion={toggleCompletion} 
+            />
           </div>
         )}
       </div>
     </div>
-  );
+  );  
 }
 
 export default MainApp;
