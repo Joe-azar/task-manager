@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";  // ✅ Removed <Router>
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";  // ✅ Added useLocation
 import AuthContext, { AuthProvider } from "./context/AuthContext";
-import Navbar from "./components/Navbar";  // ✅ Import Navbar
+import Navbar from "./components/Navbar";  
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MainApp from "./pages/MainApp";
@@ -13,9 +13,12 @@ function PrivateRoute({ element }) {
 }
 
 function App() {
+  const location = useLocation();  // ✅ Get current page location
+  const hideNavbar = location.pathname === "/login" || location.pathname === "/register";  // ✅ Hide Navbar if on Login/Register
+
   return (
     <AuthProvider>
-      <Navbar />
+      {!hideNavbar && <Navbar />}
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
