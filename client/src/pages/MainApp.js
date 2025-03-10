@@ -145,7 +145,6 @@ function MainApp() {
   
   return (
     <div className="app-container">
-      <Navbar />
       <div className="tasks-section">
         {editing ? (
           <EditTaskForm taskId={currentTaskId} updateTask={updateTask} setEditing={setEditing} />

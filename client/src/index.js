@@ -5,7 +5,6 @@ import { AuthProvider } from "./context/AuthContext";
 import App from "./App";
 import "./index.css";
 
-// ✅ Suppress future warnings by enabling v7 features early
 const routerFutureFlags = {
   future: {
     v7_startTransition: true,

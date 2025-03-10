@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import "../styles/TaskAnalytics.css";
 
 const TaskAnalytics = () => {
   const [tasks, setTasks] = useState([]);
@@ -13,7 +14,7 @@ const TaskAnalytics = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:5000/tasks", {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` }, // ✅ Ensure Bearer token
       });
 
       const data = await response.json();
@@ -37,28 +38,30 @@ const TaskAnalytics = () => {
   const COLORS = ["#00C49F", "#FF8042"];
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
-      <h2>Task Analytics</h2>
+    <div className="analytics-container">
+      <h2 className="analytics-title">📊 Task Analytics</h2>
       {loading ? (
-        <p>Loading...</p>
+        <p className="loading-text">Loading...</p>
       ) : (
-        <PieChart width={400} height={300}>
-          <Pie
-            data={chartData}
-            cx="50%"
-            cy="50%"
-            outerRadius={100}
-            fill="#8884d8"
-            dataKey="value"
-            label
-          >
-            {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
+        <div className="chart-wrapper">
+          <PieChart width={400} height={300}>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+              label
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </div>
       )}
     </div>
   );

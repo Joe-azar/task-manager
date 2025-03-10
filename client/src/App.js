@@ -1,10 +1,11 @@
 import React, { useContext } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import AuthContext from "./context/AuthContext";
+import { Routes, Route, Navigate } from "react-router-dom";  // ✅ Removed <Router>
+import AuthContext, { AuthProvider } from "./context/AuthContext";
+import Navbar from "./components/Navbar";  // ✅ Import Navbar
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MainApp from "./pages/MainApp";
-import TaskAnalytics from "./pages/TaskAnalytics";  // ✅ Import Analytics Page
+import TaskAnalytics from "./pages/TaskAnalytics";
 
 function PrivateRoute({ element }) {
   const { token } = useContext(AuthContext);
@@ -13,13 +14,16 @@ function PrivateRoute({ element }) {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/tasks" element={<PrivateRoute element={<MainApp />} />} />
-      <Route path="/analytics" element={<PrivateRoute element={<TaskAnalytics />} />} />  {/* ✅ Added Route */}
-      <Route path="*" element={<Navigate to="/login" />} />
-    </Routes>
+    <AuthProvider>
+      <Navbar />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/tasks" element={<PrivateRoute element={<MainApp />} />} />
+        <Route path="/analytics" element={<PrivateRoute element={<TaskAnalytics />} />} />
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 
